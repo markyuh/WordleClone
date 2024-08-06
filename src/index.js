@@ -1,4 +1,4 @@
-const dictionary = ['stare', 'azure', 'logic', 'pasta', 'catty'];
+const dictionary = ['cappy','stare', 'azure', 'logic', 'pasta', 'catty'];
 const state = {
     secret: dictionary[Math.floor(Math.random() * dictionary.length)],
     grid: Array(6)
@@ -39,13 +39,9 @@ function registerKeyboardEvents(){
         if (key === 'Enter'){
             if(state.currentCol === 5){
                 const word = getCurrentWord();
-                    if (isWordValid(word)){
                         revealWord(word);
                         state.currentRow++;
                         state.currentCol = 0;
-                    } else {
-                        alert('Not a valid word.');
-                    }
             }
 
         }
@@ -61,34 +57,39 @@ function registerKeyboardEvents(){
 function getCurrentWord(){
     return state.grid[state.currentRow].reduce((prev, curr)=> prev+curr);
 }
-function isWordValid(word){
-return dictionary.includes(word);
-}
 function revealWord(guess){
     const row = state.currentRow;
+    const animation_duration = 500;
 
     for (let i = 0; i<5; i++){
         const box = document.getElementById(`box${row}${i}`);
         const letter = box.textContent;
 
-        if (letter === state.secret[i]){
-            box.classList.add('right');
+        setTimeout(() => {
+            if (letter === state.secret[i]){
+                box.classList.add('right');
+    
+            } else if (state.secret.includes(letter)){
+                box.classList.add('wrong');
+            }
+            else{
+                box.classList.add('empty');
+            }
+        }, ((i+1) * animation_duration) / 2);
 
-        } else if (state.secret.includes(letter)){
-            box.classList.add('wrong');
-        }
-        else{
-            box.classList.add('empty');
-        }
+        box.classList.add('animated');
+        box.style.animationDelay = `${(i * animation_duration) / 2}ms`
     }
     const isWinner = state.secret === guess;
     const isGameOver = state.currentRow === 5;
 
-    if(isWinner){
+    setTimeout(() => {
+        if(isWinner){
         alert('Congratulations!');
     }else if (isGameOver){
         alert(`${state.secret}`);
     }
+    }, 3 * animation_duration);
 }
 
 function isLetter(key){
@@ -111,6 +112,5 @@ function startup() {
     const game = document.getElementById('game');
     drawGrid(game);
     registerKeyboardEvents();
-    console.log(state.secret);
 }
 startup();
